@@ -1,0 +1,78 @@
+version: "3.0"
+services:
+  frontend:
+    build:
+      context: ./frontend-app
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - 3000:3000
+    environment:
+      - BACKEND_URL=api-gateway
+
+  api-gateway:
+    build:
+      context: ./api-gateway/
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    volumes:
+      - './log/combined.log:/app/combined.log'
+    ports:
+      - 3001:3001
+    env_file:
+      - ./.env
+  category-service:
+    build:
+      context: ./category-service/
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    volumes:
+      - ./db/category.sqlite:/app/database.sqlite
+      - ./log/combined.log:/app/combined.log
+    expose:
+      - 3002
+    depends_on:
+      - rabbitmq
+    env_file:
+      - ./.env
+  image-service:
+    build:
+      context: ./image-service/
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    volumes:
+      - ./db/image.sqlite:/app/database.sqlite
+      - ./log/combined.log:/app/combined.log
+    expose:
+      - 3003
+    depends_on:
+      - rabbitmq
+    env_file:
+      - ./.env
+  user-service:
+    build:
+      context: ./user-service/
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    volumes:
+      - ./db/user.sqlite:/app/database.sqlite
+      - ./log/combined.log:/app/combined.log
+    expose:
+      - 3004
+    depends_on:
+      - rabbitmq
+    env_file:
+      - ./.env
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    hostname: my-rabbitmq
+    container_name: rabbitmq
+    volumes:
+      - ./rabbitmq/rabbitmq-definitions.json:/etc/rabbitmq/definitions.json
+      - ./rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+      - ./rabbitmq/data:/var/lib/rabbitmq/mnesia/rabbit@my-rabbitmq
+    ports:
+      - 15672:15672
+      - 5672:5672
+    # logging:
+    #   driver: none

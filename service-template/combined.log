@@ -1,0 +1,3 @@
+{"timestamp":"2021-07-17T21:41:41.357Z","service":"category","message":"Service category is starting","level":"info"}
+{"timestamp":"2021-07-17T21:41:41.459Z","service":"category","message":"DB is connected","level":"info"}
+{"timestamp":"2021-07-17T21:41:41.512Z","service":"category","message":"Connected to rabbitmq","level":"info"}
